@@ -50,6 +50,11 @@ If you find this code useful in your research then please cite
 
 All code was developed and tested on OSX and Ubuntu 16.04.
 
+## Install Blender
+
+This repo requires blender. To install on Linux, run `bash download_blender.sh`
+You can then use blender with the executable `./blender/blender`
+
 ## Step 1: Generating Images
 First we render synthetic images using [Blender](https://www.blender.org/), outputting both rendered images as well as a JSON file containing ground-truth scene information for each image.
 
