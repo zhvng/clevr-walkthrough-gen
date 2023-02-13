@@ -155,10 +155,10 @@ parser.add_argument('--render_tile_size', default=256, type=int,
 def main(args):
   num_digits = 6
   prefix = '%s_%s_' % (args.filename_prefix, args.split)
-  img_template = '%s%%0%dd.png' % (prefix, num_digits)
+  img_dir_template = '%s%%0%dd' % (prefix, num_digits)
   scene_template = '%s%%0%dd.json' % (prefix, num_digits)
   blend_template = '%s%%0%dd.blend' % (prefix, num_digits)
-  img_template = os.path.join(args.output_image_dir, img_template)
+  img_dir_template = os.path.join(args.output_image_dir, img_dir_template)
   scene_template = os.path.join(args.output_scene_dir, scene_template)
   blend_template = os.path.join(args.output_blend_dir, blend_template)
 
@@ -171,7 +171,7 @@ def main(args):
   
   all_scene_paths = []
   for i in range(args.num_images):
-    img_path = img_template % (i + args.start_idx)
+    img_dir_path = img_dir_template % (i + args.start_idx)
     scene_path = scene_template % (i + args.start_idx)
     all_scene_paths.append(scene_path)
     blend_path = None
@@ -182,7 +182,7 @@ def main(args):
       num_objects=num_objects,
       output_index=(i + args.start_idx),
       output_split=args.split,
-      output_image=img_path,
+      output_image_dir_path=img_dir_path,
       output_scene=scene_path,
       output_blendfile=blend_path,
     )
@@ -211,9 +211,10 @@ def render_scene(args,
     num_objects=5,
     output_index=0,
     output_split='none',
-    output_image='render.png',
+    output_image_dir_path='render',
     output_scene='render_json',
     output_blendfile=None,
+    num_angles=2,
   ):
 
   # Load the main blendfile
@@ -227,7 +228,7 @@ def render_scene(args,
   # cannot be used.
   render_args = bpy.context.scene.render
   render_args.engine = "CYCLES"
-  render_args.filepath = output_image
+  # render_args.filepath = output_image
   render_args.resolution_x = args.width
   render_args.resolution_y = args.height
   render_args.resolution_percentage = 100
@@ -255,7 +256,7 @@ def render_scene(args,
   scene_struct = {
       'split': output_split,
       'image_index': output_index,
-      'image_filename': os.path.basename(output_image),
+      'image_dir': os.path.basename(output_image_dir_path),
       'objects': [],
       'directions': {},
   }
@@ -312,18 +313,25 @@ def render_scene(args,
   # Render the scene and dump the scene data structure
   scene_struct['objects'] = objects
   scene_struct['relationships'] = compute_all_relationships(scene_struct)
-  while True:
-    try:
-      bpy.ops.render.render(write_still=True)
-      break
-    except Exception as e:
-      print(e)
 
-  with open(output_scene, 'w') as f:
-    json.dump(scene_struct, f, indent=2)
+  for angle_number in range(num_angles):
+    # TODO: move camera through scene. Move by 0.5 in each dimension for now to see what happens
+    for i in range(3):
+      bpy.data.objects['Camera'].location[i] += 0.5
 
-  if output_blendfile is not None:
-    bpy.ops.wm.save_as_mainfile(filepath=output_blendfile)
+    render_args.filepath = os.path.join(output_image_dir_path, "angle_%d.png" % angle_number)
+    while True:
+      try:
+        bpy.ops.render.render(write_still=True)
+        break
+      except Exception as e:
+        print(e)
+
+    with open(output_scene, 'w') as f:
+      json.dump(scene_struct, f, indent=2)
+
+    if output_blendfile is not None:
+      bpy.ops.wm.save_as_mainfile(filepath=output_blendfile)
 
 
 def add_random_objects(scene_struct, num_objects, args, camera):
@@ -432,15 +440,15 @@ def add_random_objects(scene_struct, num_objects, args, camera):
       'color': color_name,
     })
 
-  # Check that all objects are at least partially visible in the rendered image
-  all_visible = check_visibility(blender_objects, args.min_pixels_per_object)
-  if not all_visible:
-    # If any of the objects are fully occluded then start over; delete all
-    # objects from the scene and place them all again.
-    print('Some objects are occluded; replacing objects')
-    for obj in blender_objects:
-      utils.delete_object(obj)
-    return add_random_objects(scene_struct, num_objects, args, camera)
+  # # Check that all objects are at least partially visible in the rendered image
+  # all_visible = check_visibility(blender_objects, args.min_pixels_per_object)
+  # if not all_visible:
+  #   # If any of the objects are fully occluded then start over; delete all
+  #   # objects from the scene and place them all again.
+  #   print('Some objects are occluded; replacing objects')
+  #   for obj in blender_objects:
+  #     utils.delete_object(obj)
+  #   return add_random_objects(scene_struct, num_objects, args, camera)
 
   return objects, blender_objects
 
