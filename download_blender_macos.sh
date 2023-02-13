@@ -3,7 +3,7 @@ if [ -e blender ]; then
 else
     echo "Downloading Blender"
     curl https://download.blender.org/release/Blender2.78/blender-2.78c-OSX_10.6-x86_64.zip -o blender.zip
-    unzip blender-2.78c.zip 
+    unzip blender.zip 
     mv blender-2.78c-OSX_10.6-x86_64 blender
     rm blender-2.78c.zip
 fi
