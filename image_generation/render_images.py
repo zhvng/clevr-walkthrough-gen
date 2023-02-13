@@ -9,6 +9,7 @@ from __future__ import print_function
 import math, sys, random, argparse, json, os, tempfile
 from datetime import datetime as dt
 from collections import Counter
+import numpy as np
 
 """
 Renders random scenes using Blender, each with with a random number of objects;
@@ -31,6 +32,7 @@ except ImportError as e:
 if INSIDE_BLENDER:
   try:
     import utils
+    from camera_matrix import get_3x4_P_matrix_from_blender
   except ImportError as e:
     print("\nERROR")
     print("Running render_images.py from Blender and cannot import utils.py.") 
@@ -314,10 +316,17 @@ def render_scene(args,
   scene_struct['objects'] = objects
   scene_struct['relationships'] = compute_all_relationships(scene_struct)
 
+  camera_matrices = []
   for angle_number in range(num_angles):
     # TODO: move camera through scene. Move by 0.5 in each dimension for now to see what happens
     for i in range(3):
       bpy.data.objects['Camera'].location[i] += 0.5
+
+    P, K, RT = get_3x4_P_matrix_from_blender(camera)
+    camera_matrices.append({
+      'K': np.array(K).tolist(),
+      'Rt': np.array(RT).tolist()
+    })
 
     render_args.filepath = os.path.join(output_image_dir_path, "angle_%d.png" % angle_number)
     while True:
@@ -327,11 +336,13 @@ def render_scene(args,
       except Exception as e:
         print(e)
 
-    with open(output_scene, 'w') as f:
-      json.dump(scene_struct, f, indent=2)
+  scene_struct['camera_matrices'] = camera_matrices
 
-    if output_blendfile is not None:
-      bpy.ops.wm.save_as_mainfile(filepath=output_blendfile)
+  with open(output_scene, 'w') as f:
+    json.dump(scene_struct, f, indent=2)
+
+  if output_blendfile is not None:
+    bpy.ops.wm.save_as_mainfile(filepath=output_blendfile)
 
 
 def add_random_objects(scene_struct, num_objects, args, camera):
