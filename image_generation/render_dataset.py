@@ -11,6 +11,8 @@ from datetime import datetime as dt
 from collections import Counter
 import numpy as np
 
+# import matplotlib.image
+
 """
 Renders random scenes using Blender, each with with a random number of objects;
 each object has a random size, position, color, and shape. Objects will be
@@ -91,7 +93,7 @@ parser.add_argument('--start_idx', default=0, type=int,
          "multiple machines and recombine the results later.")
 parser.add_argument('--num_images', default=5, type=int,
     help="The number of images to render")
-parser.add_argument('--filename_prefix', default='CLEVR',
+parser.add_argument('--filename_prefix', default='',
     help="This prefix will be prepended to the rendered images and JSON scenes")
 parser.add_argument('--split', default='new',
     help="Name of the split for which we are rendering. This will be added to " +
@@ -158,7 +160,8 @@ parser.add_argument('--num_angles', default=2, type=int,
 
 def main(args):
   num_digits = 6
-  prefix = '%s_%s_' % (args.filename_prefix, args.split)
+  # prefix = '%s_%s_' % (args.filename_prefix, args.split)
+  prefix = ''
   img_dir_template = '%s%%0%dd' % (prefix, num_digits)
   scene_template = '%s%%0%dd.json' % (prefix, num_digits)
   blend_template = '%s%%0%dd.blend' % (prefix, num_digits)
@@ -194,21 +197,21 @@ def main(args):
 
   # After rendering all images, combine the JSON files for each scene into a
   # single JSON file.
-  all_scenes = []
-  for scene_path in all_scene_paths:
-    with open(scene_path, 'r') as f:
-      all_scenes.append(json.load(f))
-  output = {
-    'info': {
-      'date': args.date,
-      'version': args.version,
-      'split': args.split,
-      'license': args.license,
-    },
-    'scenes': all_scenes
-  }
-  with open(args.output_scene_file, 'w') as f:
-    json.dump(output, f)
+  # all_scenes = []
+  # for scene_path in all_scene_paths:
+    # with open(scene_path, 'r') as f:
+    #   all_scenes.append(json.load(f))
+  # output = {
+  #   'info': {
+  #     'date': args.date,
+  #     'version': args.version,
+  #     'split': args.split,
+  #     'license': args.license,
+  #   },
+  #   'scenes': all_scenes
+  # }
+  # with open(args.output_scene_file, 'w') as f:
+  #   json.dump(output, f)
 
 
 
@@ -331,7 +334,8 @@ def render_scene(args,
       'Rt': np.array(RT).tolist()
     })
 
-    render_args.filepath = os.path.join(output_image_dir_path, "angle_%d.png" % angle_number)
+    render_args.filepath = os.path.join(output_image_dir_path, "%d_rgb.png" % angle_number)
+
     while True:
       try:
         bpy.ops.render.render(write_still=True)
@@ -339,10 +343,17 @@ def render_scene(args,
       except Exception as e:
         print(e)
 
+    
+
+    # save camera poses for scene
+    camera_filepath = os.path.join(output_image_dir_path, 'cameras.json')
+    with open(camera_filepath, 'w') as f:
+      json.dump(camera_matrices, f, indent=1)
+
   scene_struct['camera_matrices'] = camera_matrices
 
-  with open(output_scene, 'w') as f:
-    json.dump(scene_struct, f, indent=2)
+  # with open(output_scene, 'w') as f:
+  #   json.dump(scene_struct, f, indent=2)
 
   if output_blendfile is not None:
     bpy.ops.wm.save_as_mainfile(filepath=output_blendfile)
