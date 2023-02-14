@@ -7,11 +7,39 @@
 
 import sys, random, os
 import bpy, bpy_extras
+import math
+from mathutils import Matrix
 
 
 """
 Some utility functions for interacting with Blender
 """
+
+def rotate(origin, point, angle):
+    """
+    Rotate a point counterclockwise by a given angle around a given origin.
+
+    The angle should be given in radians.
+    """
+    ox, oy = origin
+    px, py = point
+
+    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
+    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+    return qx, qy
+
+def rotate_object(obj, angle_degrees):
+  """
+  Rotate an object by a specified angle in degrees around Z axis.
+  """
+  
+  a = math.radians(angle_degrees)
+
+  rotated = rotate((0,0), (obj.location.x, obj.location.y), a)
+  obj.location.x = rotated[0] 
+  obj.location.y = rotated[1]
+
+  obj.rotation_euler[2] -= a
 
 
 def extract_args(input_argv=None):

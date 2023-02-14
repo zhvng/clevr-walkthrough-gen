@@ -324,9 +324,9 @@ def render_scene(args,
 
   camera_matrices = []
   for angle_number in range(num_angles):
-    # TODO: move camera through scene. Move by 0.5 in each dimension for now to see what happens
-    for i in range(3):
-      bpy.data.objects['Camera'].location[i] += 0.5
+    
+    if angle_number > 0:
+      utils.rotate_object(camera, 30)
 
     P, K, RT = get_3x4_P_matrix_from_blender(camera)
     camera_matrices.append({
@@ -342,8 +342,6 @@ def render_scene(args,
         break
       except Exception as e:
         print(e)
-
-    
 
     # save camera poses for scene
     camera_filepath = os.path.join(output_image_dir_path, 'cameras.json')
