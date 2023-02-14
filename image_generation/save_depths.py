@@ -34,12 +34,12 @@ def save_img(output_image_dir='render', num_angles=2):
     greyscale_image = np.zeros((512,512)).astype(np.uint8)
 
     for angle_number in range(num_angles):
-        depth_path = os.path.join(output_image_dir, "%d_depth.tiff" % angle_number)
+        depth_path = os.path.join(output_image_dir, "%03d_depth.tiff" % angle_number)
         
         im = Image.fromarray(greyscale_image) # float32
         im.save(depth_path)
 
-num_digits=6
+num_digits=2
 
 args = parser.parse_args()
 

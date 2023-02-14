@@ -159,7 +159,7 @@ parser.add_argument('--num_angles', default=2, type=int,
     help="Number of angles to use on a given scene")
 
 def main(args):
-  num_digits = 6
+  num_digits = 2
   # prefix = '%s_%s_' % (args.filename_prefix, args.split)
   prefix = ''
   img_dir_template = '%s%%0%dd' % (prefix, num_digits)
@@ -334,7 +334,7 @@ def render_scene(args,
       'Rt': np.array(RT).tolist()
     })
 
-    render_args.filepath = os.path.join(output_image_dir_path, "%d_rgb.png" % angle_number)
+    render_args.filepath = os.path.join(output_image_dir_path, "%03d_rgb.png" % angle_number)
 
     while True:
       try:
