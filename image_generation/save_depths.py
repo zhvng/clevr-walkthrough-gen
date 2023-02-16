@@ -31,7 +31,8 @@ def save_img(output_image_dir='render', num_angles=2):
 
     print(output_image_dir, num_angles)
 
-    greyscale_image = np.zeros((512,512)).astype(np.uint8)
+    greyscale_image = np.zeros((512,512), dtype = np.uint8)
+    greyscale_image.fill(4)
 
     for angle_number in range(num_angles):
         depth_path = os.path.join(output_image_dir, "%03d_depth.tiff" % angle_number)
