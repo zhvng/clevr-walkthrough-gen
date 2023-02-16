@@ -48,7 +48,7 @@ if INSIDE_BLENDER:
 parser = argparse.ArgumentParser()
 
 # Input options
-parser.add_argument('--base_scene_blendfile', default='data/base_scene.blend',
+parser.add_argument('--base_scene_blendfile', default='data/base_scene_extended.blend',
     help="Base blender file on which all scenes are based; includes " +
           "ground plane, lights, and camera.")
 parser.add_argument('--properties_json', default='data/properties.json',
