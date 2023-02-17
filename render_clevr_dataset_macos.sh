@@ -12,7 +12,7 @@ fi
         --max_objects 2 --render_num_samples 128 --render_tile_size 32 \
         --num_angles 6 --output_image_dir ../output/clvr_dataset/train  --output_scene_dir ../output/clvr_dataset/train \
         --base_scene_blendfile data/base_scene_4sided.blend \
-        --width 256 --height 256
+        --width 256 --height 256 --normalize_K
 )
 
 (
@@ -30,7 +30,7 @@ fi
         --max_objects 2 --render_num_samples 128 --render_tile_size 32 \
         --num_angles 6 --output_image_dir ../output/clvr_dataset/test  --output_scene_dir ../output/clvr_dataset/test \
         --base_scene_blendfile data/base_scene_4sided.blend \
-        --width 256 --height 256
+        --width 256 --height 256 --normalize_K
 )
 
 (

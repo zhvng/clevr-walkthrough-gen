@@ -125,6 +125,10 @@ parser.add_argument('--license',
 parser.add_argument('--date', default=dt.today().strftime("%m/%d/%Y"),
     help="String to store in the \"date\" field of the generated JSON file; " +
          "defaults to today's date")
+parser.add_argument('--normalize_K', action='store_true',
+    help="Normalize K so that values are between 0-1")
+parser.add_argument('--no-normalize_K', dest='normalize_K', action='store_false')
+parser.set_defaults(normalize_K=False)
 
 # Rendering options
 parser.add_argument('--use_gpu', default=0, type=int,
@@ -329,6 +333,17 @@ def render_scene(args,
       utils.rotate_object(camera, 30)
 
     P, K, RT = get_3x4_P_matrix_from_blender(camera)
+
+    # make K values 0-1
+    if args.normalize_K:
+      K = K / np.max(K)
+      K[2, 2] = 1
+
+    # make K, RT 4x4 matrix by padding
+    K = np.hstack((K, np.array([[0, 0, 0]]).T))
+    K = np.vstack((K, np.array([[0, 0, 0, 1]])))
+    RT = np.vstack((RT, np.array([[0, 0, 0, 1]])))
+
     camera_matrices.append({
       'K': np.array(K).tolist(),
       'Rt': np.array(RT).tolist()
