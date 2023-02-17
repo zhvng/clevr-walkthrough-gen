@@ -21,8 +21,10 @@ parser.add_argument('--split', default='',
     help="Name of the split for which we are rendering. This will be added to " +
          "the names of rendered images, and will also be stored in the JSON " +
          "scene structure for each image.")
-
-
+parser.add_argument('--width', default='256', type=int,
+    help="The width (in pixels) for the rendered depth images")
+parser.add_argument('--height', default='256', type=int,
+    help="The height (in pixels) for the rendered depth images")
 
 # args.num images, start idx
 
@@ -31,7 +33,7 @@ def save_img(output_image_dir='render', num_angles=2):
 
     print(output_image_dir, num_angles)
 
-    greyscale_image = np.zeros((512,512), dtype = np.uint8)
+    greyscale_image = np.zeros((args.width, args.height), dtype = np.uint8)
     greyscale_image.fill(4)
 
     for angle_number in range(num_angles):
