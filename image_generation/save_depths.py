@@ -25,6 +25,8 @@ parser.add_argument('--width', default='256', type=int,
     help="The width (in pixels) for the rendered depth images")
 parser.add_argument('--height', default='256', type=int,
     help="The height (in pixels) for the rendered depth images")
+parser.add_argument('--default_depth', default='2', type=int,
+    help="The default depth for the rendered depth images")
 
 # args.num images, start idx
 
@@ -34,7 +36,7 @@ def save_img(output_image_dir='render', num_angles=2):
     print(output_image_dir, num_angles)
 
     greyscale_image = np.zeros((args.width, args.height), dtype = np.uint8)
-    greyscale_image.fill(4)
+    greyscale_image.fill(args.default_depth)
 
     for angle_number in range(num_angles):
         depth_path = os.path.join(output_image_dir, "%03d_depth.tiff" % angle_number)

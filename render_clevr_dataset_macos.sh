@@ -17,7 +17,8 @@ fi
 
 (
     cd image_generation && python3 save_depths.py --output_image_dir ../output/clvr_dataset/train \
-        --num_angles 10 --num_images 2 --width 256 --height 256
+        --num_angles 10 --num_images 2 --width 256 --height 256 \
+        --default_depth 2
 )
 
 # testing data
@@ -34,5 +35,6 @@ fi
 
 (
     cd image_generation && python3 save_depths.py --output_image_dir ../output/clvr_dataset/test \
-        --num_angles 3 --num_images 2 --width 256 --height 256
+        --num_angles 3 --num_images 2 --width 256 --height 256 \
+        --default_depth 2
 )
