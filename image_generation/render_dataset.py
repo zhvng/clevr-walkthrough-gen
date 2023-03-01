@@ -162,6 +162,9 @@ parser.add_argument('--render_tile_size', default=256, type=int,
 parser.add_argument('--num_angles', default=2, type=int,
     help="Number of angles to use on a given scene")
 
+parser.add_argument('--trajectory', default='rotate', type=str, choices=['rotate', 'spiral'],
+    help="Number of angles to use on a given scene")
+
 def main(args):
   num_digits = 2
   # prefix = '%s_%s_' % (args.filename_prefix, args.split)
@@ -197,6 +200,7 @@ def main(args):
       output_scene=scene_path,
       output_blendfile=blend_path,
       num_angles=args.num_angles,
+      trajectory=args.trajectory,
     )
 
   # After rendering all images, combine the JSON files for each scene into a
@@ -227,6 +231,7 @@ def render_scene(args,
     output_scene='render_json',
     output_blendfile=None,
     num_angles=2,
+    trajectory='rotate',
   ):
 
   # Load the main blendfile
@@ -328,9 +333,16 @@ def render_scene(args,
 
   camera_matrices = []
   for angle_number in range(num_angles):
-    
-    if angle_number > 0:
-      utils.rotate_object(camera, 30)
+
+    if trajectory == 'rotate':
+      if angle_number > 0:
+        utils.rotate_object(camera, 30)
+
+    elif trajectory == 'spiral':
+      if angle_number > 0:
+        utils.rotate_object(camera, 30)
+        utils.translate_object(camera, 0.5, target_x=0, target_y=0, target_z=0)
+
 
     P, K, RT = get_3x4_P_matrix_from_blender(camera)
 

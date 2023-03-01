@@ -41,6 +41,27 @@ def rotate_object(obj, angle_degrees):
 
   obj.rotation_euler[2] -= a
 
+def translate_object(obj, step_size, target_x, target_y, target_z):
+  """
+  Translate an object by a specified step size in the direction of a target
+  location.
+  """
+
+  dx = target_x - obj.location.x
+  dy = target_y - obj.location.y
+  dz = target_z - obj.location.z
+
+  dist = math.sqrt(dx**2 + dy**2 + dz**2)
+  if dist == 0:
+    return
+
+  dx /= dist
+  dy /= dist
+  dz /= dist
+
+  obj.location.x += dx * step_size
+  obj.location.y += dy * step_size
+  obj.location.z += dz * step_size
 
 def extract_args(input_argv=None):
   """
