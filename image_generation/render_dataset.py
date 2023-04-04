@@ -147,6 +147,8 @@ parser.add_argument('--back_light_jitter', default=1.0, type=float,
     help="The magnitude of random jitter to add to the back light position.")
 parser.add_argument('--camera_jitter', default=0.5, type=float,
     help="The magnitude of random jitter to add to the camera position")
+parser.add_argument('--camera_dist', default=1.0, type=float,
+    help="The distance of the camera from the origin")
 parser.add_argument('--render_num_samples', default=512, type=int,
     help="The number of samples to use when rendering. Larger values will " +
          "result in nicer images but will cause rendering to take longer.")
@@ -289,6 +291,10 @@ def render_scene(args,
   if args.camera_jitter > 0:
     for i in range(3):
       bpy.data.objects['Camera'].location[i] += rand(args.camera_jitter)
+
+  if args.camera_dist != 1:
+    for i in range(3):
+      bpy.data.objects['Camera'].location[i] *= args.camera_dist
 
   # Figure out the left, up, and behind directions along the plane and record
   # them in the scene structure
